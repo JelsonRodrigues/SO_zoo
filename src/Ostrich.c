@@ -87,9 +87,9 @@ void Ostrich_eat(OstrichArgs *args){
     uint32_t eaten = 0;
     
     while (eaten < ammount_to_eat) {
-        ++eaten;
         sem_wait(args->feeder_ammount);
         sem_post(args->feeder_ammount_spaces_empty);
+        ++eaten;
         ++args->ostrich_instance->animal.eaten;
     }
 

@@ -44,7 +44,7 @@ void spawn_threads(Zoo *zoo){
         ostrich_args->incoming_communication = vec_get_addr_pos(&zoo->ostrichs_com, i);
         ostrich_args->veterinarian_comunication = &zoo->veterinarians_com;
 
-        add_consumer_to_buffer(ostrich_args->incoming_communication);
+        // add_consumer_to_buffer(ostrich_args->incoming_communication);
         add_producer_to_buffer(ostrich_args->veterinarian_comunication);
 
         pthread_t tid;
@@ -63,7 +63,7 @@ void spawn_threads(Zoo *zoo){
         lion_args->incoming_communication = vec_get_addr_pos(&zoo->lions_com, i);
         lion_args->veterinarian_comunication = &zoo->veterinarians_com;
 
-        add_consumer_to_buffer(lion_args->incoming_communication);
+        // add_consumer_to_buffer(lion_args->incoming_communication);
         add_producer_to_buffer(lion_args->veterinarian_comunication);
 
         pthread_t tid;
@@ -82,7 +82,7 @@ void spawn_threads(Zoo *zoo){
         meerkat_args->incoming_communication = vec_get_addr_pos(&zoo->meerkats_com, i);
         meerkat_args->veterinarian_comunication = &zoo->veterinarians_com;
 
-        add_consumer_to_buffer(meerkat_args->incoming_communication);
+        // add_consumer_to_buffer(meerkat_args->incoming_communication);
         add_producer_to_buffer(meerkat_args->veterinarian_comunication);
 
         pthread_t tid;
@@ -112,7 +112,7 @@ void spawn_threads(Zoo *zoo){
         veterinarian_args->meerkat_food_slots_available = &zoo->meerkat_food_slots_available;
         veterinarian_args->meerkat_food_storage = &zoo->meerkat_food_storage;
 
-        add_consumer_to_buffer(veterinarian_args->incoming_communication);
+        // add_consumer_to_buffer(veterinarian_args->incoming_communication);
         add_producer_to_buffer(veterinarian_args->supplier_communication);
 
         pthread_t tid;
@@ -297,6 +297,9 @@ void free_zoo(Zoo *zoo){
     } 
     vec_free(&zoo->meerkats_com);
 
+    free_ProducerConsumerBuffer(&zoo->supplier_com);
+    free_ProducerConsumerBuffer(&zoo->veterinarians_com);
+
     sem_destroy(&zoo->meerkat_food_storage);
     sem_destroy(&zoo->lion_food_storage);
     sem_destroy(&zoo->ostrich_food_storage);
@@ -392,7 +395,6 @@ void *zoo_run_routine(void *args){
         increment_one_hour(zoo);
         ++hours_simulated;
         sleep(1);
-        
     }
 
     terminate_all_threads(zoo);

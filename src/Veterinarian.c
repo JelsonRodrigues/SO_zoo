@@ -79,7 +79,7 @@ void Veterinarian_fill_lion_eater(VeterinarianArgs *args, uint32_t ammount){
         }
         else {
             pthread_mutex_lock(&mutex_stdout);
-            printf("Lion food storage of the Zoo is empty! Asking for a refill...");
+            printf("Lion food storage of the Zoo is empty! Asking for a refill...\n");
             pthread_mutex_unlock(&mutex_stdout);
             Veterinarian_request_stock_refill(args);
             sem_wait(args->lion_food_storage);
@@ -88,10 +88,33 @@ void Veterinarian_fill_lion_eater(VeterinarianArgs *args, uint32_t ammount){
 }
 
 void Veterinarian_fill_ostrich_eater(VeterinarianArgs *args, uint32_t ammount){
-    uint32_t ammount_filled = 0;
+    // uint32_t ammount_filled = 0;
     
+    // int32_t current_ammount = 0;
+    // sem_getvalue(args->ostrich_food_slots_available, &current_ammount);
+    
+    // pthread_mutex_lock(&mutex_stdout);
+    // printf("Ostrich eater current supply %d\n", current_ammount);
+    // pthread_mutex_unlock(&mutex_stdout);
+
+    // while (ammount_filled < ammount) {
+    //     if (sem_trywait(args->ostrich_food_storage) == 0){
+    //         sem_post(args->ostrich_food_slots_available);
+    //         ++ammount_filled;
+    //     }
+    //     else {
+    //         pthread_mutex_lock(&mutex_stdout);
+    //         printf("Ostrich food storage of the Zoo is empty! Asking for a refill...\n");
+    //         pthread_mutex_unlock(&mutex_stdout);
+    //         Veterinarian_request_stock_refill(args);
+    //         sem_wait(args->ostrich_food_storage);
+    //     }
+    // }
+
+    uint32_t ammount_filled = 0;
     int32_t current_ammount = 0;
-    sem_getvalue(args->ostrich_food_slots_available, &current_ammount);
+    
+    sem_getvalue(args->ostrich_food_filled, &current_ammount);
     
     pthread_mutex_lock(&mutex_stdout);
     printf("Ostrich eater current supply %d\n", current_ammount);
@@ -99,12 +122,13 @@ void Veterinarian_fill_ostrich_eater(VeterinarianArgs *args, uint32_t ammount){
 
     while (ammount_filled < ammount) {
         if (sem_trywait(args->ostrich_food_storage) == 0){
-            sem_post(args->ostrich_food_slots_available);
+            sem_wait(args->ostrich_food_slots_available);
+            sem_post(args->ostrich_food_filled);
             ++ammount_filled;
         }
         else {
             pthread_mutex_lock(&mutex_stdout);
-            printf("Ostrich food storage of the Zoo is empty! Asking for a refill...");
+            printf("Ostrich food storage of the Zoo is empty! Asking for a refill...\n");
             pthread_mutex_unlock(&mutex_stdout);
             Veterinarian_request_stock_refill(args);
             sem_wait(args->ostrich_food_storage);
@@ -113,10 +137,33 @@ void Veterinarian_fill_ostrich_eater(VeterinarianArgs *args, uint32_t ammount){
 }
 
 void Veterinarian_fill_meerkat_eater(VeterinarianArgs *args, uint32_t ammount){
-    uint32_t ammount_filled = 0;
+    // uint32_t ammount_filled = 0;
     
+    // int32_t current_ammount = 0;
+    // sem_getvalue(args->meerkat_food_slots_available, &current_ammount);
+    
+    // pthread_mutex_lock(&mutex_stdout);
+    // printf("Meerkat eater current supply %d\n", current_ammount);
+    // pthread_mutex_unlock(&mutex_stdout);
+
+    // while (ammount_filled < ammount) {
+    //     if (sem_trywait(args->meerkat_food_storage) == 0){
+    //         sem_post(args->meerkat_food_slots_available);
+    //         ++ammount_filled;
+    //     }
+    //     else {
+    //         pthread_mutex_lock(&mutex_stdout);
+    //         printf("Meerkat food storage of the Zoo is empty! Asking for a refill...\n");
+    //         pthread_mutex_unlock(&mutex_stdout);
+    //         Veterinarian_request_stock_refill(args);
+    //         sem_wait(args->meerkat_food_storage);
+    //     }
+    // }
+
+    uint32_t ammount_filled = 0;
     int32_t current_ammount = 0;
-    sem_getvalue(args->meerkat_food_slots_available, &current_ammount);
+    
+    sem_getvalue(args->meerkat_food_filled, &current_ammount);
     
     pthread_mutex_lock(&mutex_stdout);
     printf("Meerkat eater current supply %d\n", current_ammount);
@@ -124,12 +171,13 @@ void Veterinarian_fill_meerkat_eater(VeterinarianArgs *args, uint32_t ammount){
 
     while (ammount_filled < ammount) {
         if (sem_trywait(args->meerkat_food_storage) == 0){
-            sem_post(args->meerkat_food_slots_available);
+            sem_wait(args->meerkat_food_slots_available);
+            sem_post(args->meerkat_food_filled);
             ++ammount_filled;
         }
         else {
             pthread_mutex_lock(&mutex_stdout);
-            printf("Meerkat food storage of the Zoo is empty! Asking for a refill...");
+            printf("Meerkat food storage of the Zoo is empty! Asking for a refill...\n");
             pthread_mutex_unlock(&mutex_stdout);
             Veterinarian_request_stock_refill(args);
             sem_wait(args->meerkat_food_storage);

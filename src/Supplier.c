@@ -49,21 +49,21 @@ void supply(SupplierArgs *args) {
 
     sem_getvalue(args->lion_food_storage, &lion_food_before);
 
-    while (lion_food_before < MAX_STOCKED_FOOD) {
+    while (lion_food_before + lion_food_supplied < MAX_STOCKED_FOOD) {
         sem_post(args->lion_food_storage);
         ++lion_food_supplied;
     }
 
     sem_getvalue(args->meerkat_food_storage, &meerkat_food_before);
 
-    while (meerkat_food_before < MAX_STOCKED_FOOD) {
+    while (meerkat_food_before + meerkat_food_supplied < MAX_STOCKED_FOOD) {
         sem_post(args->meerkat_food_storage);
         ++meerkat_food_supplied;
     }
 
     sem_getvalue(args->ostrich_food_storage, &ostrich_food_before);
 
-    while (ostrich_food_before < MAX_STOCKED_FOOD) {
+    while (ostrich_food_before + ostrich_food_supplied < MAX_STOCKED_FOOD) {
         sem_post(args->ostrich_food_storage);
         ++ostrich_food_supplied;
     }
