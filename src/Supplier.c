@@ -13,12 +13,16 @@ void *Supplier_run_routine(void *args){
             {
             case REQUEST_SUPPLY_REFILL:
                 pthread_mutex_lock(&mutex_stdout);
-                printf("Supplier got a refill request\n");
+                printf("SUPPLIER ID %u: got a refill request\n", local_args->supplier_object->id);
                 pthread_mutex_unlock(&mutex_stdout);
                 supply(local_args);
                 break;
             case SYSTEM_MESSAGE :
                 if (incomming_message.message.sys_message == TERMINATE){
+                    pthread_mutex_lock(&mutex_stdout);
+                    printf("SUPPLIER ID %u: terminating...\n", local_args->supplier_object->id);
+                    pthread_mutex_unlock(&mutex_stdout);
+                    
                     remove_consumer_from_buffer(local_args->incoming_communication);
                     free(args);
                     return NULL;
@@ -26,7 +30,7 @@ void *Supplier_run_routine(void *args){
                 break;
             default:
                 pthread_mutex_lock(&mutex_stdout);
-                printf("Supplier received unknown message %d\n", incomming_message.type);
+                printf("SUPPLIER ID %u: received unknown message %d\n", local_args->supplier_object->id, incomming_message.type);
                 pthread_mutex_unlock(&mutex_stdout);
                 break;
             }

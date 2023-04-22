@@ -1,6 +1,8 @@
 #ifndef VETERINARIAN_H
 #define VETERINARIAN_H
 
+#define _GNU_SOURCE
+
 #include <stdint.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -12,6 +14,12 @@ extern pthread_mutex_t mutex_stdout;
 
 typedef struct {
     int32_t id;
+
+    uint32_t total_feeded_lion;
+    uint32_t total_feeded_ostrich;
+    uint32_t total_feeded_meerkat;
+
+    uint32_t total_requests_for_food_reffil;
 } Veterinarian;
 
 typedef struct {
@@ -40,5 +48,7 @@ void Veterinarian_fill_ostrich_eater(VeterinarianArgs *args, uint32_t ammount);
 void Veterinarian_fill_meerkat_eater(VeterinarianArgs *args, uint32_t ammount);
 
 void Veterinarian_request_stock_refill(VeterinarianArgs *args);
+
+void Veterinarian_print_log(VeterinarianArgs *args, char *message);
 
 #endif

@@ -18,6 +18,7 @@ void *Ostrich_run_routine(void *args){
                     Ostrich_handle_clock(args);
                     break;
                 case TERMINATE:
+                    Ostrich_print_log(args_local, "terminating...");
                     remove_consumer_from_buffer(args_local->incoming_communication);
                     remove_producer_from_buffer(args_local->veterinarian_comunication);
                     free(args);
@@ -28,9 +29,10 @@ void *Ostrich_run_routine(void *args){
                 }
                 break;
             default:
-            pthread_mutex_lock(&mutex_stdout);
-            printf("Unknown MESSAGE %d received by Ostrich id %d\n", incoming_message.type, args_local->ostrich_instance->animal.id);
-            pthread_mutex_unlock(&mutex_stdout);
+            char *string;
+            asprintf(&string, "Unknown message type %d!!", incoming_message.type);
+            Ostrich_print_log(args_local, string);
+            free(string);
             break;
             }
         }
@@ -57,10 +59,12 @@ void Ostrich_handle_clock(OstrichArgs *args){
     case SHOW:
         Ostrich_show(args);
         break;
-    default:
-        pthread_mutex_lock(&mutex_stdout);
-        printf("Unknown state of Ostrich id %d, state %d\n Reseting to state SLEEP", args->ostrich_instance->animal.id, args->ostrich_instance->animal.state);
-        pthread_mutex_unlock(&mutex_stdout);        
+    default:       
+        char *string;
+        asprintf(&string, "Unknown state %d, Reseting to state SLEEP!!", args->ostrich_instance->animal.state);
+        Ostrich_print_log(args, string);
+        free(string);
+
         args->ostrich_instance->animal.time_left_to_sleep = OSTRICH_MAX_SLEEP_TIME;
         Ostrich_sleep(args);
         break;
@@ -80,9 +84,10 @@ void Ostrich_eat(OstrichArgs *args){
     };
     insert_to_buffer(args->veterinarian_comunication, &m);
     
-    pthread_mutex_lock(&mutex_stdout);
-    printf("OSTRICH id %u going to EAT %u ammount\n", args->ostrich_instance->animal.id, ammount_to_eat);
-    pthread_mutex_unlock(&mutex_stdout);     
+    char *string;
+    asprintf(&string, "goint to EAT %u ammount", ammount_to_eat);
+    Ostrich_print_log(args, string);
+    free(string);   
 
     uint32_t eaten = 0;
     
@@ -93,29 +98,40 @@ void Ostrich_eat(OstrichArgs *args){
         ++args->ostrich_instance->animal.eaten;
     }
 
-    pthread_mutex_lock(&mutex_stdout);
-    printf("OSTRICH id %u finished EAT %d\n", args->ostrich_instance->animal.id, eaten);
-    pthread_mutex_unlock(&mutex_stdout);
+    Ostrich_print_log(args, "finished eating");
 
-    args->ostrich_instance->animal.state = (args->ostrich_instance->animal.state + 1) % NUMBER_OF_STATES;
+    Ostrich_change_state(args);
 }
 
 void Ostrich_sleep(OstrichArgs *args){
     if (args->ostrich_instance->animal.time_left_to_sleep > 0) {
-        pthread_mutex_lock(&mutex_stdout);
-        printf("OSTRICH ID: %u sleeping for more %u hours\n", args->ostrich_instance->animal.id, args->ostrich_instance->animal.time_left_to_sleep);
-        pthread_mutex_unlock(&mutex_stdout);
+        char *string;
+        asprintf(&string, "sleeping for more %u hours", args->ostrich_instance->animal.time_left_to_sleep);
+        Ostrich_print_log(args, string);
+        free(string);
+
         --args->ostrich_instance->animal.time_left_to_sleep;
     }
     else {
-        args->ostrich_instance->animal.state = (args->ostrich_instance->animal.state + 1) % NUMBER_OF_STATES;
+        Ostrich_change_state(args);
     }
 }
 
 void Ostrich_show(OstrichArgs *args){
-    pthread_mutex_lock(&mutex_stdout);
-    printf("AAAAHN! OSTRICH ID: %u is showing itself\n", args->ostrich_instance->animal.id);
-    pthread_mutex_unlock(&mutex_stdout);
+    Ostrich_print_log(args, "AAAAHN! Showing itself");
+    Ostrich_change_state(args);
+}
 
+
+void Ostrich_change_state(OstrichArgs *args) {
     args->ostrich_instance->animal.state = (args->ostrich_instance->animal.state + 1) % NUMBER_OF_STATES;
+    if (args->ostrich_instance->animal.state == SLEEP) {
+        args->ostrich_instance->animal.time_left_to_sleep = rand() % (OSTRICH_MAX_SLEEP_TIME - OSTRICH_MIN_SLEEP_TIME) + OSTRICH_MIN_SLEEP_TIME;
+    }
+}
+
+void Ostrich_print_log(OstrichArgs *args, char *message) {
+    pthread_mutex_lock(&mutex_stdout);
+    printf("OSTRICH ID %u: %s\n", args->ostrich_instance->animal.id, message);
+    pthread_mutex_unlock(&mutex_stdout);
 }

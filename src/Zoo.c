@@ -212,6 +212,10 @@ void instantiate_actors(Zoo *zoo){
     {
         Veterinarian veterinarian = {
             .id = i+1,
+            .total_feeded_lion = 0,
+            .total_feeded_meerkat = 0,
+            .total_feeded_ostrich = 0,
+            .total_requests_for_food_reffil = 0,
         };
         vec_push(&zoo->veterinarians, &veterinarian);  
     }
@@ -241,6 +245,7 @@ void instantiate_actors(Zoo *zoo){
 void print_zoo_stats(Zoo *zoo){
     pthread_mutex_lock(&mutex_stdout);
     
+    printf("\n\n");
     printf("Time elapsed: %u\n\n", zoo->time_elapsed);
     
     Ostrich ostrich;
@@ -267,6 +272,17 @@ void print_zoo_stats(Zoo *zoo){
 
     printf("\n");
 
+    Veterinarian veterinarian;
+    for (uint32_t c = 0; c < zoo->veterinarians.len; ++c){
+        vec_get(&zoo->veterinarians, c, &veterinarian);
+        printf("Veterinarian id: %u, ostrich feeded %u, lion feeded %u, meerkat feeded %u, supply reffil requests made %u \n", veterinarian.id, veterinarian.total_feeded_ostrich, veterinarian.total_feeded_lion, veterinarian.total_feeded_meerkat, veterinarian.total_requests_for_food_reffil);
+    }
+
+    printf("\n");
+
+    printf("Supplier id %u, supplied: %u ostrich food, %u lion food, %u meerkat food \n", zoo->supplier.id, zoo->supplier.ostrich_food_supplied, zoo->supplier.lion_food_supplied, zoo->supplier.meerkat_food_supplied);
+
+    printf("\n");
     pthread_mutex_unlock(&mutex_stdout);
 }
 

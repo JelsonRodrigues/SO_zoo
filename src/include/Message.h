@@ -36,12 +36,4 @@ typedef struct {
     MessageType type;
 } Message;
 
-typedef enum {
-    LIONS,
-    MEERKATS,
-    OSTRICHS,
-    SUPPLIERS,
-    VETERINARIANS,
-} Actor;
-
 #endif

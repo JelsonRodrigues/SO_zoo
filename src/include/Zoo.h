@@ -16,11 +16,11 @@
 
 #define MAX_STOCKED_FOOD 30
 #define MAX_AVAILABLE_FOOD 10
-#define MAXIMUM_MESSAGES 100
+#define MAXIMUM_MESSAGES 32
 
-#define LIONS 2
+#define LIONS 4
 #define OSTRICHS 7
-#define MEERKATS 4
+#define MEERKATS 10
 #define VETERINARIANS 2
 
 extern pthread_mutex_t mutex_stdout;

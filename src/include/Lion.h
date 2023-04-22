@@ -1,6 +1,8 @@
 #ifndef LION_H
 #define LION_H
 
+#define _GNU_SOURCE // needed by asprintf()
+
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -37,4 +39,9 @@ void Lion_eat(LionArgs *args);
 void Lion_sleep(LionArgs *args);
 
 void Lion_show(LionArgs *args);
+
+void Lion_change_state(LionArgs *args);
+
+void Lion_print_log(LionArgs *args, char *message);
+
 #endif

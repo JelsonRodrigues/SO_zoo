@@ -1,6 +1,8 @@
 #ifndef OSTRICH_H
 #define OSTRICH_H
 
+#define _GNU_SOURCE
+
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -37,4 +39,9 @@ void Ostrich_eat(OstrichArgs *args);
 void Ostrich_sleep(OstrichArgs *args);
 
 void Ostrich_show(OstrichArgs *args);
+
+void Ostrich_change_state(OstrichArgs *args);
+
+void Ostrich_print_log(OstrichArgs *args, char *message);
+
 #endif

@@ -262,7 +262,9 @@ inline void vec_swap(Vector *self, int index1, int index2){
 
 size_t vec_get_valid_index(const Vector *self, const int index) {
     if (self->len != 0) {
-        return index % self->len;
+        int index_copy = index;
+        while (index_copy < 0) index_copy += self->len;
+        return index_copy % self->len;
     }
     return 0;
 }

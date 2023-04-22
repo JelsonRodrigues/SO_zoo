@@ -18,6 +18,7 @@ void *Meerkat_run_routine(void *args){
                     Meerkat_handle_clock(args);
                     break;
                 case TERMINATE:
+                    Meerkat_print_log(args_local, "terminating...");
                     remove_consumer_from_buffer(args_local->incoming_communication);
                     remove_producer_from_buffer(args_local->veterinarian_comunication);
                     free(args);
@@ -28,9 +29,10 @@ void *Meerkat_run_routine(void *args){
                 }
                 break;
             default:
-            pthread_mutex_lock(&mutex_stdout);
-            printf("Unknown MESSAGE %d received by Meerkat id %d\n", incoming_message.type, args_local->meerkat_instance->animal.id);
-            pthread_mutex_unlock(&mutex_stdout);
+            char *string;
+            asprintf(&string, "Unknown message type %d!!", incoming_message.type);
+            Meerkat_print_log(args_local, string);
+            free(string);
             break;
             }
         }
@@ -58,9 +60,11 @@ void Meerkat_handle_clock(MeerkatArgs *args){
         Meerkat_show(args);
         break;
     default:
-        pthread_mutex_lock(&mutex_stdout);
-        printf("Unknown state of Meerkat id %d, state %d\n Reseting to state SLEEP", args->meerkat_instance->animal.id, args->meerkat_instance->animal.state);
-        pthread_mutex_unlock(&mutex_stdout);        
+        char *string;
+        asprintf(&string, "Unknown state %d, Reseting to state SLEEP!!", args->meerkat_instance->animal.state);
+        Meerkat_print_log(args, string);
+        free(string);
+
         args->meerkat_instance->animal.time_left_to_sleep = MEERKAT_MAX_SLEEP_TIME;
         Meerkat_sleep(args);
         break;
@@ -80,9 +84,10 @@ void Meerkat_eat(MeerkatArgs *args){
     };
     insert_to_buffer(args->veterinarian_comunication, &m);
     
-    pthread_mutex_lock(&mutex_stdout);
-    printf("Meerkat id %u going to EAT %u ammount\n", args->meerkat_instance->animal.id, ammount_to_eat);
-    pthread_mutex_unlock(&mutex_stdout);     
+    char *string;
+    asprintf(&string, "going to EAT %u ammount", ammount_to_eat);
+    Meerkat_print_log(args, string);
+    free(string);
 
     uint32_t eaten = 0;
     
@@ -93,29 +98,38 @@ void Meerkat_eat(MeerkatArgs *args){
         ++args->meerkat_instance->animal.eaten;
     }
 
-    pthread_mutex_lock(&mutex_stdout);
-    printf("Meerkat id %u finished EAT %d\n", args->meerkat_instance->animal.id, eaten);
-    pthread_mutex_unlock(&mutex_stdout);
+    Meerkat_print_log(args, "finished eating");
 
-    args->meerkat_instance->animal.state = (args->meerkat_instance->animal.state + 1) % NUMBER_OF_STATES;
+    Meerkat_change_state(args);
 }
 
 void Meerkat_sleep(MeerkatArgs *args){
     if (args->meerkat_instance->animal.time_left_to_sleep > 0) {
-        pthread_mutex_lock(&mutex_stdout);
-        printf("Meerkat ID: %u sleeping for more %u hours\n", args->meerkat_instance->animal.id, args->meerkat_instance->animal.time_left_to_sleep);
-        pthread_mutex_unlock(&mutex_stdout);
+        char *string;
+        asprintf(&string, "sleeping for more %u hours", args->meerkat_instance->animal.time_left_to_sleep);
+        Meerkat_print_log(args, string);
+        free(string);
         --args->meerkat_instance->animal.time_left_to_sleep;
     }
     else {
-        args->meerkat_instance->animal.state = (args->meerkat_instance->animal.state + 1) % NUMBER_OF_STATES;
+        Meerkat_change_state(args);
     }
 }
 
 void Meerkat_show(MeerkatArgs *args){
-    pthread_mutex_lock(&mutex_stdout);
-    printf("GRRRRN! Meerkat ID: %u is showing itself\n", args->meerkat_instance->animal.id);
-    pthread_mutex_unlock(&mutex_stdout);
+    Meerkat_print_log(args, "GRRRRN! Showing itself");
+    Meerkat_change_state(args);
+}
 
+void Meerkat_change_state(MeerkatArgs *args) {
     args->meerkat_instance->animal.state = (args->meerkat_instance->animal.state + 1) % NUMBER_OF_STATES;
+    if (args->meerkat_instance->animal.state == SLEEP) {
+        args->meerkat_instance->animal.time_left_to_sleep = rand() % (MEERKAT_MAX_SLEEP_TIME - MEERKAT_MIN_SLEEP_TIME) + MEERKAT_MIN_SLEEP_TIME;
+    }
+}
+
+void Meerkat_print_log(MeerkatArgs *args, char *message) {
+    pthread_mutex_lock(&mutex_stdout);
+    printf("MEERKAT ID %u: %s\n", args->meerkat_instance->animal.id, message);
+    pthread_mutex_unlock(&mutex_stdout);
 }

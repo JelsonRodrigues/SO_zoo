@@ -18,6 +18,7 @@ void *Lion_run_routine(void *args){
                     Lion_handle_clock(args);
                     break;
                 case TERMINATE:
+                    Lion_print_log(args_local, "terminating...");
                     remove_consumer_from_buffer(args_local->incoming_communication);
                     remove_producer_from_buffer(args_local->veterinarian_comunication);
                     free(args);
@@ -28,9 +29,10 @@ void *Lion_run_routine(void *args){
                 }
                 break;
             default:
-            pthread_mutex_lock(&mutex_stdout);
-            printf("Unknown MESSAGE %d received by Lion id %d\n", incoming_message.type, args_local->lion_instance->animal.id);
-            pthread_mutex_unlock(&mutex_stdout);
+            char *string;
+            asprintf(&string, "Unknown message type %d!!", incoming_message.type);
+            Lion_print_log(args_local, string);
+            free(string);
             break;
             }
         }
@@ -58,9 +60,11 @@ void Lion_handle_clock(LionArgs *args){
         Lion_show(args);
         break;
     default:
-        pthread_mutex_lock(&mutex_stdout);
-        printf("Unknown state of Lion id %d, state %d\n Reseting to state SLEEP", args->lion_instance->animal.id, args->lion_instance->animal.state);
-        pthread_mutex_unlock(&mutex_stdout);        
+        char *string;
+        asprintf(&string, "Unknown state %d, Reseting to state SLEEP!!", args->lion_instance->animal.state);
+        Lion_print_log(args, string);
+        free(string);
+   
         args->lion_instance->animal.time_left_to_sleep = LION_MAX_SLEEP_TIME;
         Lion_sleep(args);
         break;
@@ -79,10 +83,11 @@ void Lion_eat(LionArgs *args){
         .type = ANIMAL_EAT,
     };
     insert_to_buffer(args->veterinarian_comunication, &m);
-    
-    pthread_mutex_lock(&mutex_stdout);
-    printf("Lion id %u going to EAT %u ammount\n", args->lion_instance->animal.id, ammount_to_eat);
-    pthread_mutex_unlock(&mutex_stdout);     
+
+    char *string;
+    asprintf(&string, "goint to EAT %u ammount", ammount_to_eat);
+    Lion_print_log(args, string);
+    free(string);
 
     uint32_t eaten = 0;
     
@@ -93,29 +98,39 @@ void Lion_eat(LionArgs *args){
         ++args->lion_instance->animal.eaten;
     }
 
-    pthread_mutex_lock(&mutex_stdout);
-    printf("Lion id %u finished EAT %d\n", args->lion_instance->animal.id, eaten);
-    pthread_mutex_unlock(&mutex_stdout);
+    Lion_print_log(args, "finished eating");
 
-    args->lion_instance->animal.state = (args->lion_instance->animal.state + 1) % NUMBER_OF_STATES;
+    Lion_change_state(args);
 }
 
 void Lion_sleep(LionArgs *args){
     if (args->lion_instance->animal.time_left_to_sleep > 0) {
-        pthread_mutex_lock(&mutex_stdout);
-        printf("Lion ID: %u sleeping for more %u hours\n", args->lion_instance->animal.id, args->lion_instance->animal.time_left_to_sleep);
-        pthread_mutex_unlock(&mutex_stdout);
+        char *string;
+        asprintf(&string, "sleeping for more %u hours", args->lion_instance->animal.time_left_to_sleep);
+        Lion_print_log(args, string);
+        free(string);
+
         --args->lion_instance->animal.time_left_to_sleep;
     }
     else {
-        args->lion_instance->animal.state = (args->lion_instance->animal.state + 1) % NUMBER_OF_STATES;
+        Lion_change_state(args);
     }
 }
 
 void Lion_show(LionArgs *args){
-    pthread_mutex_lock(&mutex_stdout);
-    printf("RAAAWR! Lion ID: %u is showing itself\n", args->lion_instance->animal.id);
-    pthread_mutex_unlock(&mutex_stdout);
+    Lion_print_log(args, "RAAAWR! Showing itself");
+    Lion_change_state(args);
+}
 
+void Lion_change_state(LionArgs *args) {
     args->lion_instance->animal.state = (args->lion_instance->animal.state + 1) % NUMBER_OF_STATES;
+    if (args->lion_instance->animal.state == SLEEP) {
+        args->lion_instance->animal.time_left_to_sleep = rand() % (LION_MAX_SLEEP_TIME - LION_MIN_SLEEP_TIME) + LION_MIN_SLEEP_TIME;
+    }
+}
+
+void Lion_print_log(LionArgs *args, char *message) {
+    pthread_mutex_lock(&mutex_stdout);
+    printf("LION ID %u: %s\n", args->lion_instance->animal.id, message);
+    pthread_mutex_unlock(&mutex_stdout);
 }

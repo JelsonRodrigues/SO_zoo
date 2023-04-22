@@ -1,6 +1,8 @@
 #ifndef MEERKAT_H
 #define MEERKAT_H
 
+#define _GNU_SOURCE
+
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -37,4 +39,9 @@ void Meerkat_eat(MeerkatArgs *args);
 void Meerkat_sleep(MeerkatArgs *args);
 
 void Meerkat_show(MeerkatArgs *args);
+
+void Meerkat_change_state(MeerkatArgs *args);
+
+void Meerkat_print_log(MeerkatArgs *args, char *message);
+
 #endif

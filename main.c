@@ -10,7 +10,9 @@
 pthread_mutex_t mutex_stdout = PTHREAD_MUTEX_INITIALIZER;
 
 int main() {
+    // Setting the random number generator seed to 0, so the result is always the same
     srand(0);
+    
     // Initialize zoo
     Zoo zoo;
     
