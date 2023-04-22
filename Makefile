@@ -1,5 +1,5 @@
 # Project name
-PROJ_NAME=C_ThreadPool
+PROJ_NAME=SO_Zoo
 
 # Directories
 SRC_DIR=./src

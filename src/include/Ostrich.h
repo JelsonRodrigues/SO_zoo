@@ -23,9 +23,9 @@ typedef struct {
 typedef struct {
     Ostrich *ostrich_instance;
     sem_t *feeder_ammount;
-    sem_t* ostrich_food_needed;
-    sem_t *animals_waiting_or_eating;
-    ProducerConsumerBuffer *incomming_communication;
+    sem_t *feeder_ammount_spaces_empty;
+    ProducerConsumerBuffer *incoming_communication;
+    ProducerConsumerBuffer *veterinarian_comunication;
 } OstrichArgs;
 
 void *Ostrich_run_routine(void *args);
