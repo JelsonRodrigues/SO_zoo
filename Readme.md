@@ -1,27 +1,25 @@
-# ThreadPool done in C
-A C ThreadPool library for linux implementation (not fully done yet) using pthread library
+# SO Zoo
+Este repositório contém a implementação do trabalho final da cadeira de Sistemas Operacionais. </br>
 
-# Build & Run
-There is a `Makefile` for building the project <br>
-```shell
-git clone https://github.com/JelsonRodrigues/C_ThreadPool
-cd C_ThreadPool
-make release
+# Descrição
+Em um zoológico existem leões, suricatos e avestruzes, que devem ser alimentados por dois veterinários. </br>
+Cada animal come um tipo específico de comida e possui um ciclo diário que consiste em comer, dormir, comer e se exibir, e os veterinários podem servir do estoque do zoológico para o comedouro de cada animal de modo a manter os comedouros sempre cheios.<br>
+Quando o estoque de comida de um animal termina o veterinário pode requisitar ao fornecedor a reposição do estoque. O fornecedor reabastece o estoque de todos os animais. <br>
+Deve ser utilizada um thread, para cada animal, para cada veterinário e para o fornecedor.<br>
+
+# Implementação
+A implementação foi realizada utilizando o princípio de atores e troca de mensagens entre eles. <br>
+O zoológico possui um canal de comunicação com cada ator, e envia mensagens de atualização de hora, e eventualmente de término da simulação. <br>
+Os animais recebem as atualizações das horas, e de acordo com seu estado atual, tratam o evento. Quando os animais vão comer, eles enviam uma mensagem para os veterinários com a quantidade de alimento que irão comer. <br>
+Os veterinários recebem mensagens de término da simulação e de requisição de alimento por parte dos animais. Quando os veterinários recebem a mensagem de alimentação dos animais, eles irão atender no comedouro da espécie correspondente o quanto será comido informado na mensagem. Quando termina o suprimento do zoológico, o veterinário envia uma mensagem requisitando reabastecimento do estoque para o fornecedor.<br>
+O fornecedor recebe mensagens de término da simulação e de requisição de reabastecimento. <br>
+
+
+# Executar
+Para compilar, existe um arquivo `Makefile`. <br>
+Como é utilizado a biblioteca `pthread` para lançamento de threads, será necessário utilizar o sistema operacional `linux` com a biblioteca disponível<br>
 ```
-The result is the executable in the `./bin` folder and all object files in the `./build` folder
-
-# Features
-## Vector Library
-A vector library that can hold any data type and reallocate itself as it needs, with a lot of utility functions
-## Producer Consumer Library
-A producer consumer library that can handle buffers with any ammount of producers/consumers and when there is no more producers/consumers the consumers/producers get signaled to finish the execution. So a consumer dont wait forever for an item if there is no producers in the buffer.
-All items that were produced will be consumed before consumers dropping the channel.
-## Thread Pool Library
-A thread pool library that allow the creation of an arbitrary number of threads using the `phtreads` library. The threads communicate with a producer consumer buffer and keep waiting for `Task` to arrive. These `Task` can be inserted into a buffer, and the pool will execute the tasks.
-
-# TODO
-- [x] Finish the TheadPool implementation <br>
-- [ ] Test ProducerConsumer and TheadPool for deadlocks <br>
-- [x] Test ProducerConsumer <br>
-- [ ] Document the code <br>
-- [x] Test Vector for memory leaks and wrong acces <br>
+git clone https://github.com/JelsonRodrigues/SO_zoo
+cd SO_Zoo
+make run
+```
